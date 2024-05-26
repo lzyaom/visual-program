@@ -6,5 +6,6 @@ import { Button } from '@/components/ui/button'
 <template>
   <main>
     <TheWelcome />
+    <Button variant="destructive">aaa</Button>
   </main>
 </template>
