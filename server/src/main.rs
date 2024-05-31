@@ -1,27 +1,18 @@
 use axum::{
-    routing::get,
+    routing::{get, post, put, delete},
     Router,
+    extract::Path
 };
+use crate::router::init_router;
 
 #[tokio::main]
 async fn main() {
-    // initialize tracing
-    // tracing_subscriber::fmt::init();
-
     // build our application with a route
-    let app = Router::new()
-        // `GET /` goes to `root`
-        .route("/", get(root));
-
+    let app = init_router();
     // run our app with hyper
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
         .await
         .unwrap();
-    // tracing::debug!("listening on {}", listener.local_addr().unwrap());
+    println!("listening on {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();
-}
-
-// basic handler that responds with a static string
-async fn root() -> &'static str {
-    "Hello, World!"
 }
