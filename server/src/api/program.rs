@@ -1,14 +1,12 @@
-use axum::{
-  extract::Path
-};
+use axum::extract::Path;
 
 pub async fn get_program_list() -> &'static str {
   "Hello, World!"
 }
-pub async fn get_program(Path(id): Path<String>) -> &'static str {
-  "Hello, World!"
+pub async fn get_program(Path(id): Path<String>) -> String{
+  format!("id: {id}")
 }
-pub async fn get_program_schema(Path(id): Path<String>) -> &'static str {
+pub async fn get_program_schema(Path(_id): Path<String>) -> &'static str {
   "Hello, World!"
 }
 pub async fn create_program_schema() -> &'static str {
