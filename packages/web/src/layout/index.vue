@@ -17,7 +17,7 @@ const routes = useRouter()
 </script>
 
 <template>
-  <NavigationMenu class="max-lg:space-x-4 space-x-6 text-sm font-medium" dir="ltr">
+  <NavigationMenu class="h-14 px-2 max-lg:space-x-4 space-x-6 text-sm font-medium" dir="ltr">
     <NavigationMenuLink
       v-for="item in routes"
       :key="item.name"
