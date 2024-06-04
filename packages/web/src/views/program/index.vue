@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SquarePlus, Trash } from 'lucide-vue-next'
 import {
   Table,
   TableBody,
@@ -12,7 +13,16 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue
+  SelectValue,
+  Button,
+  Pagination,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
+  PaginationList,
+  PaginationListItem,
+  PaginationNext,
+  PaginationPrev
 } from '@/components/ui'
 const invoices = [
   {
@@ -66,49 +76,96 @@ const statusOptions = [
   { label: 'Grapes', value: 'grapes' },
   { label: 'Pineapple', value: 'pineapple' }
 ]
+
+const createProgram = () => {}
 </script>
 <template>
   <div class="page-program px-4">
-    <div class="filter mb-4">
-      <Select>
-        <SelectTrigger class="w-[180px]">
-          <SelectValue placeholder="Select a status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Fruits</SelectLabel>
-            <SelectItem v-for="item in statusOptions" :key="item.label" :value="item.value">{{
-              item.label
-            }}</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+    <div class="flex items-center justify-between space-y-2">
+      <div class="descript">
+        <h2 class="text-2xl font-bold tracking-tighter">Welcome</h2>
+        <p class="text-muted-foreground">这里是当前已创建的程序！</p>
+      </div>
+      <div class="operate space-x-2">
+        <Button class="border-dashed h-8" variant="outline" size="sm" @click="createProgram">
+          <SquarePlus class="mr-2 w-4 h-4" />
+          添加
+        </Button>
+        <Button class="border-dashed h-8" variant="outline" size="sm">
+          <Trash class="mr-2 w-4 h-4" />
+          删除
+        </Button>
+      </div>
     </div>
-    <div class="border rounded-md">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead></TableHead>
-            <TableHead>Task</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Descript</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow v-for="invoice in invoices" :key="invoice.invoice">
-            <TableCell></TableCell>
-            <TableCell>
-              {{ invoice.invoice }}
-            </TableCell>
-            <TableCell>{{ invoice.paymentStatus }}</TableCell>
-            <TableCell>{{ invoice.paymentMethod }}</TableCell>
-            <TableCell>
-              {{ invoice.totalAmount }}
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+    <div class="space-y-4">
+      <div class="filter mt-8">
+        <Select>
+          <SelectTrigger class="w-[180px]">
+            <SelectValue placeholder="Select a status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Fruits</SelectLabel>
+              <SelectItem v-for="item in statusOptions" :key="item.label" :value="item.value">{{
+                item.label
+              }}</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+      <div class="border rounded-md">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead></TableHead>
+              <TableHead>Task</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Descript</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="invoice in invoices" :key="invoice.invoice">
+              <TableCell></TableCell>
+              <TableCell>
+                {{ invoice.invoice }}
+              </TableCell>
+              <TableCell>{{ invoice.paymentStatus }}</TableCell>
+              <TableCell>{{ invoice.paymentMethod }}</TableCell>
+              <TableCell>
+                {{ invoice.totalAmount }}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="flex-1 text-sm text-muted-foreground">0 of 100 row(s) selected.</div>
+        <Pagination v-slot="{ page }" :total="20" :sibling-count="1" show-edges :default-page="1">
+          <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+            <PaginationFirst />
+            <PaginationPrev />
+            <template v-for="(item, index) in items">
+              <PaginationListItem
+                v-if="item.type === 'page'"
+                :key="index"
+                :value="item.value"
+                as-child
+              >
+                <Button
+                  class="w-10 h-10 p-0"
+                  :variant="item.value === page ? 'default' : 'outline'"
+                >
+                  {{ item.value }}
+                </Button>
+              </PaginationListItem>
+              <PaginationEllipsis v-else :key="item.type" :index="index" />
+            </template>
+            <PaginationNext />
+            <PaginationLast />
+          </PaginationList>
+        </Pagination>
+      </div>
     </div>
   </div>
 </template>
