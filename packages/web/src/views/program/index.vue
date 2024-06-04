@@ -5,9 +5,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
-} from '@/components/ui/table'
-import {
+  TableRow,
   Select,
   SelectContent,
   SelectGroup,
@@ -15,8 +13,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select'
-
+} from '@/components/ui'
 const invoices = [
   {
     invoice: 'INV001',
