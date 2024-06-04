@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toRefs } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { NavigationMenu, NavigationMenuLink } from '@/components/ui/navigation-menu'
+import { NavigationMenu, NavigationMenuLink } from '@/components/ui'
 import { cn } from '@/lib/utils'
 defineOptions({
   name: 'AppLayout'
