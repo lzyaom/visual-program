@@ -2,6 +2,8 @@
 import { ref } from 'vue'
 import { SquarePlus, Trash } from 'lucide-vue-next'
 import {
+  Input,
+  Checkbox,
   Table,
   TableBody,
   TableCell,
@@ -78,14 +80,16 @@ const statusOptions = [
   { label: 'Pineapple', value: 'pineapple' }
 ]
 
+const filterItem = ref({
+  keyword: '',
+  status: ''
+})
+
 const pages = ref({
   current: 1,
   total: 20,
   size: '10'
 })
-const changePageSize = (size: string) => {
-  pages.value.size = size
-}
 
 const createProgram = () => {}
 </script>
@@ -108,9 +112,14 @@ const createProgram = () => {}
       </div>
     </div>
     <div class="space-y-4">
-      <div class="filter mt-8">
-        <Select>
-          <SelectTrigger class="w-[180px]">
+      <div class="filter flex items-center mt-8 space-x-2">
+        <Input
+          class="w-[150px] lg:w-[250px]"
+          placeholder="Filter tasks..."
+          :model-value="filterItem.keyword"
+        />
+        <Select name="fiter-item" v-model:model-value="filterItem.status">
+          <SelectTrigger class="w-[180px] h-9 focus:ring-1 focus:ring-offset-0">
             <SelectValue placeholder="Select a status" />
           </SelectTrigger>
           <SelectContent>
@@ -127,7 +136,9 @@ const createProgram = () => {}
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead></TableHead>
+              <TableHead class="w-[50px]">
+                <Checkbox></Checkbox>
+              </TableHead>
               <TableHead>Task</TableHead>
               <TableHead>Title</TableHead>
               <TableHead>Descript</TableHead>
@@ -136,7 +147,7 @@ const createProgram = () => {}
           </TableHeader>
           <TableBody>
             <TableRow v-for="invoice in invoices" :key="invoice.invoice">
-              <TableCell></TableCell>
+              <TableCell><Checkbox></Checkbox></TableCell>
               <TableCell>
                 {{ invoice.invoice }}
               </TableCell>
@@ -156,8 +167,8 @@ const createProgram = () => {}
         <div class="flex items-center space-x-6 lg:space-x-8">
           <div class="flex items-center space-x-2">
             <p class="text-sm font-medium">Rows per page</p>
-            <Select :model-value="pages.size" @update:model-value="changePageSize">
-              <SelectTrigger class="h-8 w-[70px]">
+            <Select name="page-size" v-model:model-value="pages.size">
+              <SelectTrigger class="h-8 w-[70px] focus:ring-1 focus:ring-offset-0">
                 <SelectValue :placeholder="pages.size" />
               </SelectTrigger>
               <SelectContent side="top">
@@ -176,11 +187,12 @@ const createProgram = () => {}
             {{ Math.ceil(pages.total / +pages.size) }}
           </div>
           <Pagination
-            v-slot="{ page }"
+            v-model:page="pages.current"
             :total="pages.total"
+            :items-per-page="+pages.size"
             :sibling-count="1"
-            show-edges
             :default-page="pages.current"
+            show-edges
           >
             <PaginationList v-slot="{ items }" class="flex items-center gap-1">
               <PaginationFirst />
@@ -194,7 +206,7 @@ const createProgram = () => {}
                 >
                   <Button
                     class="w-10 h-10 p-0"
-                    :variant="item.value === page ? 'default' : 'outline'"
+                    :variant="item.value === pages.current ? 'default' : 'outline'"
                   >
                     {{ item.value }}
                   </Button>
