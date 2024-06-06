@@ -3,13 +3,7 @@ import { ref } from 'vue'
 import { SquarePlus, Trash } from 'lucide-vue-next'
 import {
   Input,
-  Checkbox,
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
   Select,
   SelectContent,
   SelectGroup,
@@ -27,48 +21,49 @@ import {
   PaginationNext,
   PaginationPrev
 } from '@/components/ui'
+import type { Columns } from '@/components/ui'
 const invoices = [
   {
-    invoice: 'INV001',
-    paymentStatus: 'Paid',
-    totalAmount: '$250.00',
-    paymentMethod: 'Credit Card'
+    task: 'INV001',
+    title: 'Paid',
+    status: '$250.00',
+    descript: 'Credit Card'
   },
   {
-    invoice: 'INV002',
-    paymentStatus: 'Pending',
-    totalAmount: '$150.00',
-    paymentMethod: 'PayPal'
+    task: 'INV002',
+    title: 'Pending',
+    status: '$150.00',
+    descript: 'PayPal'
   },
   {
-    invoice: 'INV003',
-    paymentStatus: 'Unpaid',
-    totalAmount: '$350.00',
-    paymentMethod: 'Bank Transfer'
+    task: 'INV003',
+    title: 'Unpaid',
+    status: '$350.00',
+    descript: 'Bank Transfer'
   },
   {
-    invoice: 'INV004',
-    paymentStatus: 'Paid',
-    totalAmount: '$450.00',
-    paymentMethod: 'Credit Card'
+    task: 'INV004',
+    title: 'Paid',
+    status: '$450.00',
+    descript: 'Credit Card'
   },
   {
-    invoice: 'INV005',
-    paymentStatus: 'Paid',
-    totalAmount: '$550.00',
-    paymentMethod: 'PayPal'
+    task: 'INV005',
+    title: 'Paid',
+    status: '$550.00',
+    descript: 'PayPal'
   },
   {
-    invoice: 'INV006',
-    paymentStatus: 'Pending',
-    totalAmount: '$200.00',
-    paymentMethod: 'Bank Transfer'
+    task: 'INV006',
+    title: 'Pending',
+    status: '$200.00',
+    descript: 'Bank Transfer'
   },
   {
-    invoice: 'INV007',
-    paymentStatus: 'Unpaid',
-    totalAmount: '$300.00',
-    paymentMethod: 'Credit Card'
+    task: 'INV007',
+    title: 'Unpaid',
+    status: '$300.00',
+    descript: 'Credit Card'
   }
 ]
 
@@ -84,6 +79,32 @@ const filterItem = ref({
   keyword: '',
   status: ''
 })
+
+const columns: Columns[] = [
+  {
+    prop: 'checkout'
+  },
+  {
+    prop: 'task',
+    label: 'Task'
+  },
+  {
+    prop: 'title',
+    label: 'Title'
+  },
+  {
+    prop: 'descript',
+    label: 'Descript'
+  },
+  {
+    prop: 'status',
+    label: 'Status'
+  },
+  {
+    prop: 'action',
+    label: ''
+  }
+]
 
 const pages = ref({
   current: 1,
@@ -133,32 +154,7 @@ const createProgram = () => {}
         </Select>
       </div>
       <div class="border rounded-md">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead class="w-[50px]">
-                <Checkbox></Checkbox>
-              </TableHead>
-              <TableHead>Task</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Descript</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="invoice in invoices" :key="invoice.invoice">
-              <TableCell><Checkbox></Checkbox></TableCell>
-              <TableCell>
-                {{ invoice.invoice }}
-              </TableCell>
-              <TableCell>{{ invoice.paymentStatus }}</TableCell>
-              <TableCell>{{ invoice.paymentMethod }}</TableCell>
-              <TableCell>
-                {{ invoice.totalAmount }}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+        <Table :columns="columns" :data="invoices"></Table>
       </div>
       <div class="flex items-center justify-between">
         <div class="flex-1 text-sm text-muted-foreground">
