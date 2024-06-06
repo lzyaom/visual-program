@@ -5,5 +5,7 @@ import Layout from '@/layout/index.vue'
 
 <template>
   <Layout></Layout>
-  <RouterView />
+  <Teleport to="main">
+    <RouterView />
+  </Teleport>
 </template>
