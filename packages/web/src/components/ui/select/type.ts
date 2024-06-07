@@ -1,7 +1,7 @@
 export interface SelectOption {
-  lable: string
+  label: string
   value: any
-  disabled: boolean
+  disabled?: boolean
 }
 
 export interface SelectItemSlot {
@@ -11,5 +11,7 @@ export interface SelectItemSlot {
 export interface SelectGroupOption {
   label: string
   options: Array<SelectOption>
-  disabled: boolean
+  disabled?: boolean
 }
+
+export type OptionType = SelectOption | SelectGroupOption
