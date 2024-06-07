@@ -5,12 +5,7 @@ import {
   Input,
   Table,
   Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
+  type OptionType,
   Button,
   Pagination,
   PaginationEllipsis,
@@ -67,12 +62,19 @@ const invoices = [
   }
 ]
 
-const statusOptions = [
+const statusOptions: OptionType[] = [
   { label: 'Apple', value: 'apple' },
   { label: 'Banana', value: 'banana' },
   { label: 'Blueberry', value: 'blueberry' },
   { label: 'Grapes', value: 'grapes' },
   { label: 'Pineapple', value: 'pineapple' }
+]
+const pageSizeOption: OptionType[] = [
+  { label: '10', value: 10 },
+  { label: '20', value: 20 },
+  { label: '30', value: 30 },
+  { label: '40', value: 40 },
+  { label: '50', value: 50 }
 ]
 
 const filterItem = ref({
@@ -139,18 +141,12 @@ const createProgram = () => {}
           placeholder="Filter tasks..."
           :model-value="filterItem.keyword"
         />
-        <Select name="fiter-item" v-model:model-value="filterItem.status">
-          <SelectTrigger class="w-[180px] h-9 focus:ring-1 focus:ring-offset-0">
-            <SelectValue placeholder="Select a status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Fruits</SelectLabel>
-              <SelectItem v-for="item in statusOptions" :key="item.label" :value="item.value">{{
-                item.label
-              }}</SelectItem>
-            </SelectGroup>
-          </SelectContent>
+        <Select
+          :options="statusOptions"
+          name="fiter-item"
+          v-model:model-value="filterItem.status"
+          placeholder="Select a Status"
+        >
         </Select>
       </div>
       <div class="border rounded-md">
@@ -163,8 +159,8 @@ const createProgram = () => {}
         <div class="flex items-center space-x-6 lg:space-x-8">
           <div class="flex items-center space-x-2">
             <p class="text-sm font-medium">Rows per page</p>
-            <Select name="page-size" v-model:model-value="pages.size">
-              <SelectTrigger class="h-8 w-[70px] focus:ring-1 focus:ring-offset-0">
+            <Select :options="pageSizeOption" name="page-size" v-model:model-value="pages.size">
+              <!-- <SelectTrigger class="h-8 w-[70px] focus:ring-1 focus:ring-offset-0">
                 <SelectValue :placeholder="pages.size" />
               </SelectTrigger>
               <SelectContent side="top">
@@ -175,7 +171,7 @@ const createProgram = () => {}
                 >
                   {{ pageSize }}
                 </SelectItem>
-              </SelectContent>
+              </SelectContent> -->
             </Select>
           </div>
           <div class="flex w-[100px] items-center justify-center text-sm font-medium">
