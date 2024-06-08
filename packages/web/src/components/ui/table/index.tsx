@@ -16,7 +16,7 @@ export interface Columns {
   isSlot?: boolean
 }
 
-export default defineComponent({
+export const TableRoot = defineComponent({
   name: 'TableRoot',
   props: {
     columns: {

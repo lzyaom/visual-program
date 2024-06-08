@@ -1,21 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { SquarePlus, Trash } from 'lucide-vue-next'
-import {
-  Input,
-  Table,
-  Select,
-  type OptionType,
-  Button,
-  Pagination,
-  PaginationEllipsis,
-  PaginationFirst,
-  PaginationLast,
-  PaginationList,
-  PaginationListItem,
-  PaginationNext,
-  PaginationPrev
-} from '@/components/ui'
+import { Input, Table, Select, type OptionType, Button, Pagination } from '@/components/ui'
 import type { Columns } from '@/components/ui'
 const invoices = [
   {
@@ -152,65 +138,18 @@ const createProgram = () => {}
       <div class="border rounded-md">
         <Table :columns="columns" :data="invoices"></Table>
       </div>
-      <div class="flex items-center justify-between">
-        <div class="flex-1 text-sm text-muted-foreground">
-          0 of {{ pages.size }} row(s) selected.
-        </div>
-        <div class="flex items-center space-x-6 lg:space-x-8">
-          <div class="flex items-center space-x-2">
-            <p class="text-sm font-medium">Rows per page</p>
-            <Select :options="pageSizeOption" name="page-size" v-model:model-value="pages.size">
-              <!-- <SelectTrigger class="h-8 w-[70px] focus:ring-1 focus:ring-offset-0">
-                <SelectValue :placeholder="pages.size" />
-              </SelectTrigger>
-              <SelectContent side="top">
-                <SelectItem
-                  v-for="pageSize in [10, 20, 30, 40, 50]"
-                  :key="pageSize"
-                  :value="`${pageSize}`"
-                >
-                  {{ pageSize }}
-                </SelectItem>
-              </SelectContent> -->
-            </Select>
-          </div>
-          <div class="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {{ pages.current }} of
-            {{ Math.ceil(pages.total / +pages.size) }}
-          </div>
-          <Pagination
-            v-model:page="pages.current"
-            :total="pages.total"
-            :items-per-page="+pages.size"
-            :sibling-count="1"
-            :default-page="pages.current"
-            show-edges
+      <Pagination v-model:page="pages.current" :total="pages.total" :size="+pages.size">
+        <template #size>
+          <p class="text-sm font-medium">Rows per page</p>
+          <Select
+            name="page-size"
+            placeholder="Select a size"
+            :options="pageSizeOption"
+            v-model:model-value="pages.size"
           >
-            <PaginationList v-slot="{ items }" class="flex items-center gap-1">
-              <PaginationFirst />
-              <PaginationPrev />
-              <template v-for="(item, index) in items">
-                <PaginationListItem
-                  v-if="item.type === 'page'"
-                  :key="index"
-                  :value="item.value"
-                  as-child
-                >
-                  <Button
-                    class="w-10 h-10 p-0"
-                    :variant="item.value === pages.current ? 'default' : 'outline'"
-                  >
-                    {{ item.value }}
-                  </Button>
-                </PaginationListItem>
-                <PaginationEllipsis v-else :key="item.type" :index="index" />
-              </template>
-              <PaginationNext />
-              <PaginationLast />
-            </PaginationList>
-          </Pagination>
-        </div>
-      </div>
+          </Select>
+        </template>
+      </Pagination>
     </div>
   </div>
 </template>
