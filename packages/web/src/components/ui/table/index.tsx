@@ -1,5 +1,5 @@
 /* @jsxImportSource vue */
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import type { PropType } from 'vue'
 import { default as Table } from './Table.vue'
 import { default as TableCell } from './TableCell.vue'
@@ -32,38 +32,72 @@ export const TableRoot = defineComponent({
       default: 'Empty'
     }
   },
-  setup(props, { slots }) {
+  emits: {
+    'selection-change': (rows: any[]) => Array.isArray(rows)
+  },
+  setup(props, { slots, emit }) {
     const { columns, data } = props
-
-    const renderRow = (data: Array<any>, columns: Columns[]) => {
-      if (data.length === 0) {
-        return <TableEmpty>{slots.empty ? slots.empty() : props.emptyText}</TableEmpty>
+    const isAllCheck = ref(false)
+    const selectedRows = ref<Set<any>>(new Set())
+    const selectAll = (value: boolean) => {
+      if (value) {
+        for (const item of data) {
+          selectedRows.value.add(item)
+        }
+      } else {
+        selectedRows.value.clear()
       }
-      return data.map((row) => (
-        <TableRow>
-          {columns.map((col) => {
-            if (col.prop === 'checkout') {
-              return (
-                <TableCell>
-                  <Checkbox></Checkbox>
-                </TableCell>
-              )
-            }
-            return <TableCell>{col.isSlot ? slots[col.prop]!(row) : row[col.prop]}</TableCell>
-          })}
-        </TableRow>
-      ))
+      isAllCheck.value = value
+      emit('selection-change', Array.from(selectedRows.value))
     }
+
+    const selectItem = (value: boolean, row: any) => {
+      if (value) {
+        selectedRows.value.add(row)
+        if (!isAllCheck.value) {
+          isAllCheck.value = true
+        }
+      } else {
+        selectedRows.value.delete(row)
+        if (selectedRows.value.size === 0) {
+          isAllCheck.value = false
+        }
+      }
+      emit('selection-change', Array.from(selectedRows.value))
+    }
+
+    const renderRow = (row: any, index: number, columns: Columns[]) => (
+      <TableRow>
+        {columns.map((col) => {
+          if (col.prop === 'selection') {
+            return (
+              <TableCell>
+                <Checkbox
+                  name="check-item"
+                  checked={selectedRows.value.has(row)}
+                  onUpdate:checked={(value) => selectItem(value, row)}
+                ></Checkbox>
+              </TableCell>
+            )
+          }
+          return <TableCell>{col.isSlot ? slots[col.prop]!(row) : row[col.prop]}</TableCell>
+        })}
+      </TableRow>
+    )
 
     return () => (
       <Table>
         <TableHeader>
           <TableRow>
             {columns.map((item) => {
-              if (item.prop === 'checkout') {
+              if (item.prop === 'selection') {
                 return (
                   <TableHead>
-                    <Checkbox></Checkbox>
+                    <Checkbox
+                      name="select-all"
+                      checked={isAllCheck.value}
+                      onUpdate:checked={selectAll}
+                    ></Checkbox>
                   </TableHead>
                 )
               }
@@ -71,7 +105,13 @@ export const TableRoot = defineComponent({
             })}
           </TableRow>
         </TableHeader>
-        <TableBody>{renderRow(data, columns)}</TableBody>
+        <TableBody>
+          {data.length === 0 ? (
+            <TableEmpty>{slots.empty ? slots.empty() : props.emptyText}</TableEmpty>
+          ) : (
+            data.map((row, index) => renderRow(row, index, columns))
+          )}
+        </TableBody>
       </Table>
     )
   }
