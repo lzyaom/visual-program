@@ -1,20 +1,14 @@
-/* @jsxImportSource vue */
 import { defineComponent, ref } from 'vue'
 import type { PropType } from 'vue'
-import { default as Table } from './Table.vue'
-import { default as TableCell } from './TableCell.vue'
-import { default as TableEmpty } from './TableEmpty.vue'
-import { default as TableHead } from './TableHead.vue'
-import { default as TableHeader } from './TableHeader.vue'
-import { default as TableBody } from './TableBody.vue'
-import { default as TableRow } from './TableRow.vue'
+import Table from './Table.vue'
+import TableCell from './TableCell.vue'
+import TableEmpty from './TableEmpty.vue'
+import TableHead from './TableHead.vue'
+import TableHeader from './TableHeader.vue'
+import TableBody from './TableBody.vue'
+import TableRow from './TableRow.vue'
 import { Checkbox } from '..'
-
-export interface Columns {
-  prop: string
-  label?: string
-  isSlot?: boolean
-}
+import type { Columns } from './type'
 
 export const TableRoot = defineComponent({
   name: 'TableRoot',
@@ -29,7 +23,7 @@ export const TableRoot = defineComponent({
     },
     emptyText: {
       type: String,
-      default: 'Empty'
+      default: 'No results'
     }
   },
   emits: {
@@ -92,7 +86,7 @@ export const TableRoot = defineComponent({
             {columns.map((item) => {
               if (item.prop === 'selection') {
                 return (
-                  <TableHead>
+                  <TableHead class={item.attrs?.class}>
                     <Checkbox
                       name="select-all"
                       checked={isAllCheck.value}
@@ -101,13 +95,15 @@ export const TableRoot = defineComponent({
                   </TableHead>
                 )
               }
-              return <TableHead>{item.label}</TableHead>
+              return <TableHead class={item.attrs?.class}>{item.label}</TableHead>
             })}
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
-            <TableEmpty>{slots.empty ? slots.empty() : props.emptyText}</TableEmpty>
+            <TableEmpty class={`text-center`} colspan={columns.length}>
+              {slots.empty ? slots.empty() : props.emptyText}
+            </TableEmpty>
           ) : (
             data.map((row, index) => renderRow(row, index, columns))
           )}
