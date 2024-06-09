@@ -1,4 +1,4 @@
-import { defineComponent, toRefs, type FunctionalComponent, type PropType } from 'vue'
+import { defineComponent, type FunctionalComponent } from 'vue'
 import { PaginationRoot, PaginationList, PaginationListItem } from 'radix-vue'
 import PaginationEllipsis from './PaginationEllipsis.vue'
 import PaginationFirst from './PaginationFirst.vue'
@@ -34,6 +34,7 @@ const PaginationListRoot: FunctionalComponent<{ page: number }> = ({ page }) => 
 }
 
 export const Pagination = defineComponent({
+  name: 'Pagination',
   props: {
     page: {
       type: Number,
@@ -47,36 +48,30 @@ export const Pagination = defineComponent({
     total: {
       type: Number,
       default: 0
-    },
-    onChange: {
-      type: Function as PropType<(page: number) => any>
     }
   },
   emits: {
-    'update:page': (value: number) => Number.isInteger(value),
-    change: (page: number) => Number.isInteger(page)
+    'update:page': (value: number) => Number.isInteger(value)
   },
   setup(props, { slots, emit }) {
-    const { page, size, total } = toRefs(props)
-
     return () => (
       <div class="flex items-center justify-between">
-        <div class="flex-1 text-sm text-muted-foreground">0 of {size} row(s) selected.</div>
+        {slots.select && slots.select()}
         <div class="flex items-center space-x-6 lg:space-x-8">
-          <div class="flex items-center space-x-2">{slots.size && slots.size()}</div>
-          <div class="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {page.value} of {Math.ceil(total.value / size.value)}
-          </div>
+          {slots.size && slots.size()}
+          {slots.page && slots.page()}
           <PaginationRoot
-            page={page.value}
-            total={total.value}
-            items-per-page={size.value}
+            class={'pagination'}
+            as={'div'}
+            page={props.page}
+            total={props.total}
+            items-per-page={props.size}
             sibling-count={1}
             default-page={1}
             show-edges
             onUpdate:page={(value: number) => emit('update:page', value)}
           >
-            <PaginationListRoot page={page.value}></PaginationListRoot>
+            <PaginationListRoot page={props.page}></PaginationListRoot>
           </PaginationRoot>
         </div>
       </div>

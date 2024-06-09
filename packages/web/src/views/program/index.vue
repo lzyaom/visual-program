@@ -109,6 +109,10 @@ const createProgram = () => {}
 const selctionChange = (rows: any[]) => {
   selectRows.value = rows
 }
+const changePageSize = (size: string) => {
+  pages.value.size = size
+  pages.value.current = 1
+}
 </script>
 <template>
   <div class="page-program px-8 pt-4">
@@ -147,15 +151,26 @@ const selctionChange = (rows: any[]) => {
         <Table :columns="columns" :data="invoices" @selection-change="selctionChange"></Table>
       </div>
       <Pagination v-model:page="pages.current" :total="pages.total" :size="+pages.size">
+        <template #select>
+          <div class="flex-1 text-sm text-muted-foreground">
+            {{ selectRows.length }} of {{ pages.size }} row(s) selected.
+          </div>
+        </template>
         <template #size>
-          <p class="text-sm font-medium">Rows per page</p>
-          <Select
-            name="page-size"
-            placeholder="Select a size"
-            :options="pageSizeOption"
-            v-model:model-value="pages.size"
-          >
-          </Select>
+          <div class="flex items-center space-x-2">
+            <p class="text-sm font-medium">Rows per page</p>
+            <Select
+              name="page-size"
+              placeholder="Select a size"
+              :options="pageSizeOption"
+              v-model:model-value="pages.size"
+            />
+          </div>
+        </template>
+        <template #page>
+          <div class="flex w-[100px] items-center justify-center text-sm font-medium">
+            Page {{ pages.current }} of {{ Math.ceil(pages.total / +pages.size) }}
+          </div>
         </template>
       </Pagination>
     </div>
