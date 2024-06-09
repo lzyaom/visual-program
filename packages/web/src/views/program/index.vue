@@ -110,7 +110,6 @@ const selctionChange = (rows: any[]) => {
   selectRows.value = rows
 }
 const changePageSize = (size: string) => {
-  pages.value.size = size
   pages.value.current = 1
 }
 </script>
@@ -163,7 +162,7 @@ const changePageSize = (size: string) => {
               name="page-size"
               placeholder="Select a size"
               :options="pageSizeOption"
-              :model-value="pages.size"
+              v-model:model-value="pages.size"
               @change="changePageSize"
             />
           </div>
