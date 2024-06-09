@@ -163,7 +163,8 @@ const changePageSize = (size: string) => {
               name="page-size"
               placeholder="Select a size"
               :options="pageSizeOption"
-              v-model:model-value="pages.size"
+              :model-value="pages.size"
+              @change="changePageSize"
             />
           </div>
         </template>
