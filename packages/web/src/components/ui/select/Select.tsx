@@ -1,14 +1,15 @@
 import { defineComponent, type PropType } from 'vue'
-import { default as Select } from './Select.vue'
-import { default as SelectContent } from './SelectContent.vue'
-import { default as SelectGroup } from './SelectGroup.vue'
-import { default as SelectValue } from './SelectValue.vue'
-import { default as SelectItem } from './SelectItem.vue'
-import { default as SelectLabel } from './SelectLabel.vue'
-import { default as SelectTrigger } from './SelectTrigger.vue'
+import Select from './Select.vue'
+import SelectContent from './SelectContent.vue'
+import SelectGroup from './SelectGroup.vue'
+import SelectValue from './SelectValue.vue'
+import SelectItem from './SelectItem.vue'
+import SelectLabel from './SelectLabel.vue'
+import SelectTrigger from './SelectTrigger.vue'
 import type { OptionType } from './type'
 
 export default defineComponent({
+  name: 'SelectWrapper',
   props: {
     options: {
       type: Array as PropType<Array<OptionType>>,
@@ -16,7 +17,10 @@ export default defineComponent({
     },
     placeholder: String
   },
-  setup(props, { slots }) {
+  emits: {
+    change: (value: string) => value !== null
+  },
+  setup(props, { emit }) {
     const { options, placeholder } = props
     const renderOption = (options: Array<OptionType>) =>
       options.map((option) => {
@@ -40,7 +44,7 @@ export default defineComponent({
       })
 
     return () => (
-      <Select>
+      <Select onUpdate:modelValue={(value: string) => emit('change', value)}>
         <SelectTrigger class="w-[180px] h-9 focus:ring-1 focus:ring-offset-0">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
