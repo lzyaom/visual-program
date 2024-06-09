@@ -1,22 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { SquarePlus, Trash } from 'lucide-vue-next'
-import {
-  Input,
-  Table,
-  Select,
-  type OptionType,
-  Button,
-  Pagination,
-  PaginationEllipsis,
-  PaginationFirst,
-  PaginationLast,
-  PaginationList,
-  PaginationListItem,
-  PaginationNext,
-  PaginationPrev
-} from '@/components/ui'
+import { Input, Table, Select, type OptionType, Button, Pagination } from '@/components/ui'
 import type { Columns } from '@/components/ui'
+
+defineOptions({
+  name: 'ProgramListPage'
+})
+
 const invoices = [
   {
     task: 'INV001',
@@ -84,7 +75,7 @@ const filterItem = ref({
 
 const columns: Columns[] = [
   {
-    prop: 'checkout'
+    prop: 'selection'
   },
   {
     prop: 'task',
@@ -113,8 +104,15 @@ const pages = ref({
   total: 20,
   size: '10'
 })
-
+const selectRows = ref<any[]>([])
 const createProgram = () => {}
+const selctionChange = (rows: any[]) => {
+  selectRows.value = rows
+}
+const changePageSize = (size: string) => {
+  pages.value.size = size
+  pages.value.current = 1
+}
 </script>
 <template>
   <div class="page-program px-8 pt-4">
@@ -150,67 +148,32 @@ const createProgram = () => {}
         </Select>
       </div>
       <div class="border rounded-md">
-        <Table :columns="columns" :data="invoices"></Table>
+        <Table :columns="columns" :data="invoices" @selection-change="selctionChange"></Table>
       </div>
-      <div class="flex items-center justify-between">
-        <div class="flex-1 text-sm text-muted-foreground">
-          0 of {{ pages.size }} row(s) selected.
-        </div>
-        <div class="flex items-center space-x-6 lg:space-x-8">
+      <Pagination v-model:page="pages.current" :total="pages.total" :size="+pages.size">
+        <template #select>
+          <div class="flex-1 text-sm text-muted-foreground">
+            {{ selectRows.length }} of {{ pages.size }} row(s) selected.
+          </div>
+        </template>
+        <template #size>
           <div class="flex items-center space-x-2">
             <p class="text-sm font-medium">Rows per page</p>
-            <Select :options="pageSizeOption" name="page-size" v-model:model-value="pages.size">
-              <!-- <SelectTrigger class="h-8 w-[70px] focus:ring-1 focus:ring-offset-0">
-                <SelectValue :placeholder="pages.size" />
-              </SelectTrigger>
-              <SelectContent side="top">
-                <SelectItem
-                  v-for="pageSize in [10, 20, 30, 40, 50]"
-                  :key="pageSize"
-                  :value="`${pageSize}`"
-                >
-                  {{ pageSize }}
-                </SelectItem>
-              </SelectContent> -->
-            </Select>
+            <Select
+              name="page-size"
+              placeholder="Select a size"
+              :options="pageSizeOption"
+              :model-value="pages.size"
+              @change="changePageSize"
+            />
           </div>
+        </template>
+        <template #page>
           <div class="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {{ pages.current }} of
-            {{ Math.ceil(pages.total / +pages.size) }}
+            Page {{ pages.current }} of {{ Math.ceil(pages.total / +pages.size) }}
           </div>
-          <Pagination
-            v-model:page="pages.current"
-            :total="pages.total"
-            :items-per-page="+pages.size"
-            :sibling-count="1"
-            :default-page="pages.current"
-            show-edges
-          >
-            <PaginationList v-slot="{ items }" class="flex items-center gap-1">
-              <PaginationFirst />
-              <PaginationPrev />
-              <template v-for="(item, index) in items">
-                <PaginationListItem
-                  v-if="item.type === 'page'"
-                  :key="index"
-                  :value="item.value"
-                  as-child
-                >
-                  <Button
-                    class="w-10 h-10 p-0"
-                    :variant="item.value === pages.current ? 'default' : 'outline'"
-                  >
-                    {{ item.value }}
-                  </Button>
-                </PaginationListItem>
-                <PaginationEllipsis v-else :key="item.type" :index="index" />
-              </template>
-              <PaginationNext />
-              <PaginationLast />
-            </PaginationList>
-          </Pagination>
-        </div>
-      </div>
+        </template>
+      </Pagination>
     </div>
   </div>
 </template>
