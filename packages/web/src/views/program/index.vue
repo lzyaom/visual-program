@@ -3,6 +3,11 @@ import { ref } from 'vue'
 import { SquarePlus, Trash } from 'lucide-vue-next'
 import { Input, Table, Select, type OptionType, Button, Pagination } from '@/components/ui'
 import type { Columns } from '@/components/ui'
+
+defineOptions({
+  name: 'ProgramListPage'
+})
+
 const invoices = [
   {
     task: 'INV001',
@@ -70,7 +75,7 @@ const filterItem = ref({
 
 const columns: Columns[] = [
   {
-    prop: 'checkout'
+    prop: 'selection'
   },
   {
     prop: 'task',
@@ -99,8 +104,11 @@ const pages = ref({
   total: 20,
   size: '10'
 })
-
+const selectRows = ref<any[]>([])
 const createProgram = () => {}
+const selctionChange = (rows: any[]) => {
+  selectRows.value = rows
+}
 </script>
 <template>
   <div class="page-program px-8 pt-4">
@@ -136,7 +144,7 @@ const createProgram = () => {}
         </Select>
       </div>
       <div class="border rounded-md">
-        <Table :columns="columns" :data="invoices"></Table>
+        <Table :columns="columns" :data="invoices" @selection-change="selctionChange"></Table>
       </div>
       <Pagination v-model:page="pages.current" :total="pages.total" :size="+pages.size">
         <template #size>
