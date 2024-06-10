@@ -1,54 +1,78 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { SquarePlus, Trash } from 'lucide-vue-next'
-import { Input, Table, Select, type OptionType, Button, Pagination } from '@/components/ui'
+import {
+  SquarePlusIcon,
+  TrashIcon,
+  EllipsisIcon,
+  Share2Icon,
+  PencilIcon,
+  CopyIcon,
+  StarIcon
+  // WatchIcon,
+  // CheckCircleIcon,
+  // PencilLineIcon
+} from 'lucide-vue-next'
+import {
+  Input,
+  Table,
+  Select,
+  type OptionType,
+  Button,
+  Pagination,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut
+} from '@/components/ui'
 import type { Columns } from '@/components/ui'
 
 defineOptions({
   name: 'ProgramListPage'
 })
 
-const invoices = [
+const programList = [
   {
     task: 'INV001',
     title: 'Paid',
-    status: '$250.00',
+    status: 'Done',
     descript: 'Credit Card'
   },
   {
     task: 'INV002',
     title: 'Pending',
-    status: '$150.00',
+    status: 'Draft',
     descript: 'PayPal'
   },
   {
     task: 'INV003',
     title: 'Unpaid',
-    status: '$350.00',
+    status: 'Done',
     descript: 'Bank Transfer'
   },
   {
     task: 'INV004',
     title: 'Paid',
-    status: '$450.00',
+    status: 'In Process',
     descript: 'Credit Card'
   },
   {
     task: 'INV005',
     title: 'Paid',
-    status: '$550.00',
+    status: 'Draft',
     descript: 'PayPal'
   },
   {
     task: 'INV006',
     title: 'Pending',
-    status: '$200.00',
+    status: 'Done',
     descript: 'Bank Transfer'
   },
   {
     task: 'INV007',
     title: 'Unpaid',
-    status: '$300.00',
+    status: 'In Process',
     descript: 'Credit Card'
   }
 ]
@@ -75,7 +99,10 @@ const filterItem = ref({
 
 const columns: Columns[] = [
   {
-    prop: 'selection'
+    prop: 'selection',
+    attrs: {
+      class: 'w-[60px]'
+    }
   },
   {
     prop: 'task',
@@ -91,11 +118,15 @@ const columns: Columns[] = [
   },
   {
     prop: 'status',
-    label: 'Status'
+    label: 'Status',
+    icon: 'CheckCircleIcon'
   },
   {
     prop: 'action',
-    label: ''
+    isSlot: !0,
+    attrs: {
+      class: 'w-[90px]'
+    }
   }
 ]
 
@@ -109,10 +140,14 @@ const createProgram = () => {}
 const selctionChange = (rows: any[]) => {
   selectRows.value = rows
 }
-const changePageSize = (size: string) => {
-  pages.value.size = size
+const changePageSize = () => {
   pages.value.current = 1
 }
+const handleEdit = () => {}
+const handleCopy = () => {}
+const handleFavorite = () => {}
+const handleShare = () => {}
+const handleDelete = () => {}
 </script>
 <template>
   <div class="page-program px-8 pt-4">
@@ -123,11 +158,11 @@ const changePageSize = (size: string) => {
       </div>
       <div class="operate space-x-2">
         <Button class="border-dashed h-8" variant="outline" size="sm" @click="createProgram">
-          <SquarePlus class="mr-2 w-4 h-4" />
+          <SquarePlusIcon class="mr-2 w-4 h-4" />
           添加
         </Button>
         <Button class="border-dashed h-8" variant="outline" size="sm">
-          <Trash class="mr-2 w-4 h-4" />
+          <TrashIcon class="mr-2 w-4 h-4" />
           删除
         </Button>
       </div>
@@ -148,7 +183,40 @@ const changePageSize = (size: string) => {
         </Select>
       </div>
       <div class="border rounded-md">
-        <Table :columns="columns" :data="invoices" @selection-change="selctionChange"></Table>
+        <Table :columns="columns" :data="programList" @selection-change="selctionChange">
+          <template #action>
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <Button variant="ghost" class="flex h-8 w-8 p-0 data-[state=open]:bg-muted">
+                  <EllipsisIcon class="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" class="w-[160px]">
+                <DropdownMenuItem class="cursor-pointer" @click="handleEdit">
+                  Edit
+                  <DropdownMenuShortcut><PencilIcon class="w-3 h-3" /></DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem class="cursor-pointer" @click="handleCopy">
+                  Copy
+                  <DropdownMenuShortcut><CopyIcon class="w-3 h-3" /></DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem class="cursor-pointer" @click="handleFavorite">
+                  Favorite
+                  <DropdownMenuShortcut><StarIcon class="w-3 h-3" /></DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem class="cursor-pointer" @click="handleShare">
+                  Share
+                  <DropdownMenuShortcut><Share2Icon class="w-3 h-3" /></DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem class="cursor-pointer" @click="handleDelete">
+                  Delete
+                  <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </template>
+        </Table>
       </div>
       <Pagination v-model:page="pages.current" :total="pages.total" :size="+pages.size">
         <template #select>
@@ -163,7 +231,7 @@ const changePageSize = (size: string) => {
               name="page-size"
               placeholder="Select a size"
               :options="pageSizeOption"
-              :model-value="pages.size"
+              v-model:model-value="pages.size"
               @change="changePageSize"
             />
           </div>

@@ -15,10 +15,14 @@ export default defineComponent({
       type: Array as PropType<Array<OptionType>>,
       required: true
     },
-    placeholder: String
+    placeholder: String,
+    modelValue: {
+      type: String
+    }
   },
   emits: {
-    change: (value: string) => value !== null
+    change: (value: string) => value !== null,
+    'update:model-value': (value: any) => value !== null
   },
   setup(props, { emit }) {
     const { options, placeholder } = props
@@ -43,8 +47,14 @@ export default defineComponent({
         )
       })
 
+    const handleChange = (value: string) => {
+      if (value !== props.modelValue) {
+        emit('change', value)
+      }
+      emit('update:model-value', value)
+    }
     return () => (
-      <Select onUpdate:modelValue={(value: string) => emit('change', value)}>
+      <Select modelValue={props.modelValue} onUpdate:modelValue={handleChange}>
         <SelectTrigger class="w-[180px] h-9 focus:ring-1 focus:ring-offset-0">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
