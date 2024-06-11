@@ -1,6 +1,10 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct User {
-  account: Stringm,
-  psw: String,
-  salt: String,
-  nickname: String,
+    account: String,
+    psw: String,
+    salt: String,
+    nickname: String,
+    avatar: String,
 }
