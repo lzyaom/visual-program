@@ -1,2 +1,2 @@
-pub mod program;
 pub mod plugin;
+pub mod program;
