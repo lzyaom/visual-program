@@ -11,9 +11,10 @@ pub enum ProgramStatus {
 // todo 实现多人协同程序文件
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Program {
-    id: ObjectId,
-    title: String,
-    status: ProgramStatus,
-    descript: String,
-    create_time: String,
+    #[serde(rename = "_id")]
+    pub id: Option<ObjectId>,
+    pub title: String,
+    pub status: ProgramStatus,
+    pub descript: String,
+    pub create_time: String,
 }

@@ -3,10 +3,10 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Plugin {
-    name: String,
-    url: String,
-    descript: String,
-    icon: String,
+    pub name: String,
+    pub url: String,
+    pub descript: String,
+    pub icon: String,
     // meta: Map<String, String>,
 }
 
