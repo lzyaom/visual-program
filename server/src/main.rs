@@ -1,15 +1,11 @@
-use std::{env, sync::Arc};
-
 use axum::{Extension, Router};
 use server::{db, router::init_router};
 
 #[tokio::main]
 async fn main() {
     // build our application with a route
-    let client = db::init_mongo_client().await.unwrap();
-    let db_name = env::var("DATABASE_NAME").expect("database name must set");
-    let progrom_db = client.database(&db_name);
-    let share_db = Arc::new(progrom_db);
+    let share_db = db::init_mongo_client().await;
+
     let api_routes = init_router();
     let app = Router::new().nest("/api", api_routes).layer(Extension(share_db));
     // run our app with hyper
