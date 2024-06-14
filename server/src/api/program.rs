@@ -1,7 +1,11 @@
 use crate::{db::ShareDB, models::program::Program};
 use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension, Json};
 use futures::stream::TryStreamExt;
-use mongodb::{bson::{doc, oid::ObjectId}, options::FindOptions, Collection};
+use mongodb::{
+    bson::{doc, oid::ObjectId},
+    options::FindOptions,
+    Collection,
+};
 use serde_json::json;
 
 /// 获取程序列表
@@ -56,7 +60,7 @@ pub async fn create_program_schema(db: Extension<ShareDB>, Json(data): Json<Prog
 
     match result {
         Ok(_) => (StatusCode::OK).into_response(),
-        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR).into_response()
+        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR).into_response(),
     }
 }
 
@@ -70,7 +74,7 @@ pub async fn update_program_schema(db: Extension<ShareDB>, Path(id): Path<String
 
     match result {
         Some(_) => (StatusCode::OK).into_response(),
-        None => (StatusCode::NOT_FOUND, Json(json!({"msg": "not found"}))).into_response()
+        None => (StatusCode::NOT_FOUND, Json(json!({"msg": "not found"}))).into_response(),
     }
 }
 
@@ -88,8 +92,8 @@ pub async fn create_program(db: Extension<ShareDB>, Json(data): Json<Program>) -
         Ok(value) => {
             println!("{:#?}", value);
             (StatusCode::OK).into_response()
-        },
-        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR).into_response()
+        }
+        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR).into_response(),
     }
 }
 
@@ -103,7 +107,7 @@ pub async fn update_program(db: Extension<ShareDB>, Path(id): Path<String>, Json
 
     match result {
         Some(_) => (StatusCode::OK).into_response(),
-        None => (StatusCode::NOT_FOUND, Json(json!({"msg": "not found"}))).into_response()
+        None => (StatusCode::NOT_FOUND, Json(json!({"msg": "not found"}))).into_response(),
     }
 }
 

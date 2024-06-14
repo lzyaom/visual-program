@@ -1,6 +1,8 @@
 use crate::api::{
+    collaboration::multi_person_collaboration,
     plugin::{create_plugin, create_plugin_schema, delete_plugin, get_plugin, get_plugin_schema, update_plugin, update_plugin_schema},
     program::{create_program, create_program_schema, detele_program, get_program, get_program_list, get_program_schema, run_program, update_program, update_program_schema},
+    user::{login, logout, register, update_user_info},
 };
 use axum::{
     routing::{get, post},
@@ -17,6 +19,9 @@ pub fn init_router() -> Router {
         .route("/plugin", post(create_plugin).put(update_plugin).delete(delete_plugin))
         .route("/plugin/:id", get(get_plugin))
         .route("/plugin/schema", post(create_plugin_schema).put(update_plugin_schema))
-        .route("/plugin/schema/:id", get(get_plugin_schema));
+        .route("/plugin/schema/:id", get(get_plugin_schema))
+        .route("/login", post(login).post(logout))
+        .route("/user/:id", post(register).put(update_user_info))
+        .route("/collaboration", post(multi_person_collaboration));
     app
 }
