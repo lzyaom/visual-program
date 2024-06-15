@@ -65,12 +65,19 @@ pub async fn create_program_schema(db: Extension<ShareDB>, Json(data): Json<Prog
 }
 
 /// 更新 schema
-pub async fn update_program_schema(db: Extension<ShareDB>, Path(id): Path<String>, Json(data): Json<Program>) -> impl IntoResponse {
+pub async fn update_program_schema(
+    db: Extension<ShareDB>,
+    Path(id): Path<String>,
+    Json(data): Json<Program>,
+) -> impl IntoResponse {
     let id = ObjectId::parse_str(&id).unwrap();
 
     let collection: Collection<Program> = db.collection("program");
 
-    let result = collection.find_one_and_replace(doc! {"_id": id}, data, None).await.unwrap();
+    let result = collection
+        .find_one_and_replace(doc! {"_id": id}, data, None)
+        .await
+        .unwrap();
 
     match result {
         Some(_) => (StatusCode::OK).into_response(),
@@ -98,12 +105,19 @@ pub async fn create_program(db: Extension<ShareDB>, Json(data): Json<Program>) -
 }
 
 /// 通过 `id` 更新程序
-pub async fn update_program(db: Extension<ShareDB>, Path(id): Path<String>, Json(data): Json<Program>) -> impl IntoResponse {
+pub async fn update_program(
+    db: Extension<ShareDB>,
+    Path(id): Path<String>,
+    Json(data): Json<Program>,
+) -> impl IntoResponse {
     let id = ObjectId::parse_str(&id).unwrap();
 
     let collection: Collection<Program> = db.collection("program");
 
-    let result = collection.find_one_and_replace(doc! {"_id": id}, data, None).await.unwrap();
+    let result = collection
+        .find_one_and_replace(doc! {"_id": id}, data, None)
+        .await
+        .unwrap();
 
     match result {
         Some(_) => (StatusCode::OK).into_response(),
