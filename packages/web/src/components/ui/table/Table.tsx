@@ -30,12 +30,11 @@ export const TableRoot = defineComponent({
     'selection-change': (rows: any[]) => Array.isArray(rows)
   },
   setup(props, { slots, emit }) {
-    const { columns, data } = props
     const isAllCheck = ref(false)
     const selectedRows = ref<Set<any>>(new Set())
     const selectAll = (value: boolean) => {
       if (value) {
-        for (const item of data) {
+        for (const item of props.data) {
           selectedRows.value.add(item)
         }
       } else {
@@ -83,7 +82,7 @@ export const TableRoot = defineComponent({
       <Table>
         <TableHeader>
           <TableRow>
-            {columns.map((item) => {
+            {props.columns.map((item) => {
               if (item.prop === 'selection') {
                 return (
                   <TableHead class={item.attrs?.class}>
@@ -100,12 +99,12 @@ export const TableRoot = defineComponent({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.length === 0 ? (
-            <TableEmpty class={`text-center`} colspan={columns.length}>
+          {props.data.length === 0 ? (
+            <TableEmpty class={`text-center`} colspan={props.columns.length}>
               {slots.empty ? slots.empty() : props.emptyText}
             </TableEmpty>
           ) : (
-            data.map((row, index) => renderRow(row, index, columns))
+            props.data.map((row, index) => renderRow(row, index, props.columns))
           )}
         </TableBody>
       </Table>
