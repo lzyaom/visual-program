@@ -18,3 +18,13 @@ pub struct Program {
     pub descript: String,
     pub create_time: String,
 }
+
+/// 查询参数
+#[derive(Debug, Deserialize)]
+pub struct ProgramQuery {
+    pub title: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: ProgramStatus,
+    pub page: i64,
+    pub size: i64,
+}
