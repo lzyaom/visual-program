@@ -1,66 +1,105 @@
-use crate::{db::ShareDB, models::program::Program};
-use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension, Json};
+use crate::{
+    db::ShareDB,
+    models::program::{Program, ProgramQuery},
+};
+use axum::{
+    extract::{Path, Query},
+    http::StatusCode,
+    Extension, Json,
+};
 use futures::stream::TryStreamExt;
 use mongodb::{
     bson::{doc, oid::ObjectId},
     options::FindOptions,
     Collection,
 };
-use serde_json::json;
+use serde_json::{json, Value};
 
 /// 获取程序列表
-pub async fn get_program_list(db: Extension<ShareDB>) -> impl IntoResponse {
+pub async fn get_program_list(
+    db: Extension<ShareDB>,
+    Query(params): Query<ProgramQuery>,
+) -> Result<Json<Value>, StatusCode> {
+    let ProgramQuery {
+        title,
+        status,
+        page,
+        size,
+    } = params;
+
     let collection: Collection<Program> = db.collection("program");
 
-    let find_options = FindOptions::builder().sort(doc! {"create_time": -1}).build();
+    let status = serde_json::to_string(&status).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let cursor = collection.find(None, find_options).await.unwrap();
+    let filter_options = doc! { "title": title, "status": status };
 
-    let list: Vec<Program> = cursor.try_collect().await.unwrap();
+    let skip_count: u64 = ((page - 1) * size).try_into().unwrap();
 
-    (StatusCode::OK, Json(list)).into_response()
+    let find_options = FindOptions::builder()
+        .sort(doc! {"create_time": -1})
+        .limit(size)
+        .skip(skip_count)
+        .build();
+
+    let cursor = collection
+        .find(filter_options, find_options)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let list: Vec<Program> = cursor
+        .try_collect()
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    Ok(Json(json!({"code": 0, "msg": "", "data": list})))
 }
 
 /// 通过 `id` 获取程序 [`Program`]
-pub async fn get_program(db: Extension<ShareDB>, Path(id): Path<String>) -> impl IntoResponse {
+pub async fn get_program(db: Extension<ShareDB>, Path(id): Path<String>) -> Result<Json<Value>, StatusCode> {
     let collection: Collection<Program> = db.collection("program");
 
-    let id = ObjectId::parse_str(&id).unwrap();
+    let id = ObjectId::parse_str(&id).map_err(|_| StatusCode::BAD_REQUEST)?;
 
     let program = collection.find_one(doc! {"_id": id}, None).await.unwrap();
 
     match program {
-        Some(value) => (StatusCode::OK, Json(value)).into_response(),
-        None => (StatusCode::NOT_FOUND, "not found").into_response(),
+        Some(value) => Ok(Json(json!({"code": 0, "msg": "", "data": value}))),
+        None => Err(StatusCode::NOT_FOUND),
     }
 }
 
 /// 获取程序 schema
-pub async fn get_program_schema(db: Extension<ShareDB>, Path(id): Path<String>) -> impl IntoResponse {
-    let id = ObjectId::parse_str(&id).unwrap();
+pub async fn get_program_schema(db: Extension<ShareDB>, Path(id): Path<String>) -> Result<Json<Value>, StatusCode> {
+    let id = ObjectId::parse_str(&id).map_err(|_| StatusCode::BAD_REQUEST)?;
 
     let collection: Collection<Program> = db.collection("program");
 
     let program = collection.find_one(doc! {"_id": id}, None).await.unwrap();
 
     match program {
-        Some(value) => (StatusCode::OK, Json(value)).into_response(),
-        None => (StatusCode::OK, Json("")).into_response(),
+        Some(value) => Ok(Json(json!({"code": 0, "msg": "", "data": value}))),
+        None => Err(StatusCode::NOT_FOUND),
     }
 }
 
 /// 创建程序 schema
-pub async fn create_program_schema(db: Extension<ShareDB>, Json(data): Json<Program>) -> impl IntoResponse {
+pub async fn create_program_schema(
+    db: Extension<ShareDB>,
+    Json(data): Json<Program>,
+) -> Result<Json<Value>, StatusCode> {
     let mut data = data;
 
     data.id = Some(ObjectId::new());
 
     let collection: Collection<Program> = db.collection("program");
-    let result = collection.insert_one(data, None).await;
+    let result = collection
+        .insert_one(data, None)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR);
 
     match result {
-        Ok(_) => (StatusCode::OK).into_response(),
-        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR).into_response(),
+        Ok(_) => Ok(Json(json!({"code": 0, "msg": "create success"}))),
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
 
@@ -69,38 +108,38 @@ pub async fn update_program_schema(
     db: Extension<ShareDB>,
     Path(id): Path<String>,
     Json(data): Json<Program>,
-) -> impl IntoResponse {
-    let id = ObjectId::parse_str(&id).unwrap();
+) -> Result<Json<Value>, StatusCode> {
+    let id = ObjectId::parse_str(&id).map_err(|_| StatusCode::BAD_REQUEST)?;
 
     let collection: Collection<Program> = db.collection("program");
 
     let result = collection
         .find_one_and_replace(doc! {"_id": id}, data, None)
         .await
-        .unwrap();
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     match result {
-        Some(_) => (StatusCode::OK).into_response(),
-        None => (StatusCode::NOT_FOUND, Json(json!({"msg": "not found"}))).into_response(),
+        Some(_) => Ok(Json(json!({"code": 0, "msg": "update success"}))),
+        None => Err(StatusCode::NOT_FOUND),
     }
 }
 
 /// 创建程序 [`Program`]
-pub async fn create_program(db: Extension<ShareDB>, Json(data): Json<Program>) -> impl IntoResponse {
+pub async fn create_program(db: Extension<ShareDB>, Json(data): Json<Program>) -> Result<Json<Value>, StatusCode> {
     let mut data = data;
 
     data.id = Some(ObjectId::new());
 
     let collection: Collection<Program> = db.collection("program");
 
-    let result = collection.insert_one(data, None).await;
+    let result = collection
+        .insert_one(data, None)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR);
 
     match result {
-        Ok(value) => {
-            println!("{:#?}", value);
-            (StatusCode::OK).into_response()
-        }
-        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR).into_response(),
+        Ok(_) => Ok(Json(json!({"code": 0, "msg": "create success"}))),
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
 
@@ -109,38 +148,41 @@ pub async fn update_program(
     db: Extension<ShareDB>,
     Path(id): Path<String>,
     Json(data): Json<Program>,
-) -> impl IntoResponse {
-    let id = ObjectId::parse_str(&id).unwrap();
+) -> Result<Json<Value>, StatusCode> {
+    let id = ObjectId::parse_str(&id).map_err(|_| StatusCode::BAD_REQUEST)?;
 
     let collection: Collection<Program> = db.collection("program");
 
     let result = collection
         .find_one_and_replace(doc! {"_id": id}, data, None)
         .await
-        .unwrap();
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     match result {
-        Some(_) => (StatusCode::OK).into_response(),
-        None => (StatusCode::NOT_FOUND, Json(json!({"msg": "not found"}))).into_response(),
+        Some(_) => Ok(Json(json!({"code": 0, "msg": "update success"}))),
+        None => Err(StatusCode::NOT_FOUND),
     }
 }
 
 /// 通过 `id` 删除程序 [`Program`]
-pub async fn detele_program(db: Extension<ShareDB>, Path(id): Path<String>) -> impl IntoResponse {
-    let id = ObjectId::parse_str(&id).map_err(|_| StatusCode::BAD_REQUEST).unwrap();
+pub async fn detele_program(db: Extension<ShareDB>, Path(id): Path<String>) -> Result<Json<Value>, StatusCode> {
+    let id = ObjectId::parse_str(&id).map_err(|_| StatusCode::BAD_REQUEST)?;
 
     let collection: Collection<Program> = db.collection("program");
 
-    let result = collection.delete_one(doc! {"_id": id}, None).await.unwrap();
+    let result = collection
+        .delete_many(doc! {"_id": id}, None)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     if result.deleted_count > 0 {
-        (StatusCode::NO_CONTENT).into_response()
+        Ok(Json(json!({"code": 0, "msg": "delete success"})))
     } else {
-        (StatusCode::NOT_FOUND, Json(json!({"error": "not found"}))).into_response()
+        Err(StatusCode::NOT_FOUND)
     }
 }
 
 /// 运行程序 [`Program`]
-pub async fn run_program() -> impl IntoResponse {
-    (StatusCode::OK).into_response()
+pub async fn run_program() -> Result<Json<Value>, StatusCode> {
+    Ok(Json(json!({"code": 0})))
 }
