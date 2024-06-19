@@ -1,6 +1,7 @@
 pub mod api;
 pub mod compile;
 pub mod db;
+pub mod error;
 pub mod middleware;
 pub mod models;
 pub mod router;
