@@ -16,15 +16,3 @@ pub async fn update_plugin() -> Result<Json<Value>, StatusCode> {
 pub async fn delete_plugin() -> Result<Json<Value>, StatusCode> {
     Ok(Json(json!({})))
 }
-
-pub async fn get_plugin_schema(Path(_id): Path<String>) -> Result<Json<Value>, StatusCode> {
-    Ok(Json(json!({})))
-}
-
-pub async fn create_plugin_schema() -> Result<Json<Value>, StatusCode> {
-    Ok(Json(json!({})))
-}
-
-pub async fn update_plugin_schema() -> Result<Json<Value>, StatusCode> {
-    Ok(Json(json!({})))
-}
