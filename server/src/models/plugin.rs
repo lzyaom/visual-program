@@ -12,7 +12,7 @@ pub struct Plugin {
 
 impl Plugin {
     /// Creates a new [`Plugin`].
-    fn _new(self, data: Plugin) -> Self {
+    pub fn new(self, data: Plugin) -> Self {
         Plugin { ..data }
     }
 }
