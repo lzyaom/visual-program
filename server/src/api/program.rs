@@ -1,6 +1,10 @@
 use crate::{
+    compile::{check::check_content, generate::create_run_file, parse::parse_to_js_code},
     db::ShareDB,
-    models::program::{Program, ProgramQuery},
+    models::{
+        program::{Program, ProgramQuery},
+        schema::Schema,
+    },
 };
 use axum::{
     extract::{Path, Query},
@@ -127,6 +131,37 @@ pub async fn detele_program(db: Extension<ShareDB>, Path(id): Path<String>) -> R
 }
 
 /// 运行程序 [`Program`]
-pub async fn run_program() -> Result<Json<Value>, StatusCode> {
-    Ok(Json(json!({"code": 0})))
+pub async fn run_program() -> Result<Json<Value>, Json<Value>> {
+    let schema = json!({"type": "object", "title": "aaa", "properties": {}, "required": []});
+
+    let data = json!({"title": "aa"});
+
+    // 1. 校验内容是否符合 schema
+    let result = check_content(&schema, &data);
+
+    if let Err(error) = result {
+        return Err(Json(json!({
+            "code": 100,
+            "msg": "fail",
+            "data": error
+        })));
+    }
+
+    // 2. 解析内容
+    let schema_content: Schema = serde_json::from_value(schema).expect("");
+
+    let code = parse_to_js_code(&schema_content);
+
+    // 3. 生成可执行文件
+    let result = create_run_file(code, String::from("js"));
+
+    if let Err(error) = result {
+        return Err(Json(json!({
+            "code": 101,
+            "msg": error
+        })));
+    }
+    // 4. 运行
+
+    Ok(Json(json!({"code": 0, "msg": "succss"})))
 }
