@@ -1,5 +1,5 @@
 use crate::{
-    compile::{check::check_content, generate::create_run_file, parse::parse_to_js_code},
+    compile::{check::check_content, Compiler},
     db::ShareDB,
     models::{
         program::{Program, ProgramQuery},
@@ -150,10 +150,12 @@ pub async fn run_program() -> Result<Json<Value>, Json<Value>> {
     // 2. 解析内容
     let schema_content: Schema = serde_json::from_value(schema).expect("");
 
-    let code = parse_to_js_code(&schema_content);
+    let compiler = Compiler::new();
+
+    let code = compiler.parser.gen_to_code(&schema_content);
 
     // 3. 生成可执行文件
-    let result = create_run_file(code, String::from("js"));
+    let result = compiler.create_file(code);
 
     if let Err(error) = result {
         return Err(Json(json!({
