@@ -1,13 +1,8 @@
 use crate::api::{
     collaboration::multi_person_collaboration,
-    plugin::{
-        create_plugin, create_plugin_schema, delete_plugin, get_plugin, get_plugin_schema, update_plugin,
-        update_plugin_schema,
-    },
-    program::{
-        create_program, create_program_schema, detele_program, get_program, get_program_list, get_program_schema,
-        run_program, update_program, update_program_schema,
-    },
+    plugin::{create_plugin, delete_plugin, get_plugin, update_plugin},
+    program::{create_program, detele_program, get_program, get_program_list, run_program, update_program},
+    schema::{create_schema, get_schema, update_schema},
     user::{login, logout, register, update_user_info},
 };
 use axum::{
@@ -23,15 +18,10 @@ pub fn init_router() -> Router {
             get(get_program).delete(detele_program).put(update_program),
         )
         .route("/program/run", post(run_program))
-        .route("/program/schema", post(create_program_schema))
-        .route(
-            "/program/schema/:id",
-            get(get_program_schema).put(update_program_schema),
-        )
+        .route("/schema", post(create_schema))
+        .route("/schema/:id", get(get_schema).put(update_schema))
         .route("/plugin", post(create_plugin).put(update_plugin).delete(delete_plugin))
         .route("/plugin/:id", get(get_plugin))
-        .route("/plugin/schema", post(create_plugin_schema).put(update_plugin_schema))
-        .route("/plugin/schema/:id", get(get_plugin_schema))
         .route("/login", post(login))
         .route("/logout", post(logout))
         .route("/user/:id", post(register).put(update_user_info))
