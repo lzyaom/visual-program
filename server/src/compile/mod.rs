@@ -3,7 +3,7 @@ pub mod error;
 mod parser;
 
 use dotenv::dotenv;
-use parser::{js::JSParser, Parser};
+use parser::{js::JSParser, python::PythonParser, Parser};
 use std::{env, fs, path::Path};
 
 pub struct Compiler {
@@ -12,10 +12,14 @@ pub struct Compiler {
 }
 
 impl Compiler {
-    pub fn new() -> Self {
+    pub fn new(parser_type: Option<&str>) -> Self {
+        let parser: Box<dyn Parser> = match parser_type {
+            Some("py") => Box::new(PythonParser {}),
+            _ => Box::new(JSParser {}),
+        };
         Compiler {
             file_name: String::from("runtime"),
-            parser: Box::new(JSParser {}),
+            parser,
         }
     }
 

@@ -2,7 +2,7 @@ use crate::{
     compile::{check::check_content, Compiler},
     db::ShareDB,
     models::{
-        program::{Program, ProgramQuery},
+        program::{ExecFile, Program, ProgramQuery},
         schema::Schema,
     },
 };
@@ -17,6 +17,7 @@ use mongodb::{
     options::FindOptions,
     Collection,
 };
+use serde::de::value;
 use serde_json::{json, Value};
 
 /// 获取程序列表
@@ -131,7 +132,7 @@ pub async fn detele_program(db: Extension<ShareDB>, Path(id): Path<String>) -> R
 }
 
 /// 运行程序 [`Program`]
-pub async fn run_program() -> Result<Json<Value>, Json<Value>> {
+pub async fn run_program(Json(payload): Json<ExecFile>) -> Result<Json<Value>, Json<Value>> {
     let schema = json!({"type": "object", "title": "aaa", "properties": {}, "required": []});
 
     let data = json!({"title": "aa"});
@@ -150,7 +151,9 @@ pub async fn run_program() -> Result<Json<Value>, Json<Value>> {
     // 2. 解析内容
     let schema_content: Schema = serde_json::from_value(schema).expect("");
 
-    let compiler = Compiler::new();
+    let ExecFile { file_type } = payload;
+
+    let compiler = Compiler::new(file_type.as_deref());
 
     let code = compiler.parser.gen_to_code(&schema_content);
 
