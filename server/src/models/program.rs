@@ -30,7 +30,7 @@ pub struct ProgramQuery {
     pub size: i64,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct ExecFile {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub file_type: Option<String>,

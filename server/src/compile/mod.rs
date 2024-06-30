@@ -1,9 +1,10 @@
 pub mod check;
 pub mod error;
 mod parser;
+mod run;
 
 use dotenv::dotenv;
-use parser::{js::JSParser, python::PythonParser, Parser};
+use parser::{python::PythonParser, Parser};
 use std::{env, fs, path::Path};
 
 pub struct Compiler {
@@ -12,14 +13,10 @@ pub struct Compiler {
 }
 
 impl Compiler {
-    pub fn new(parser_type: Option<&str>) -> Self {
-        let parser: Box<dyn Parser> = match parser_type {
-            Some("py") => Box::new(PythonParser {}),
-            _ => Box::new(JSParser {}),
-        };
+    pub fn new() -> Self {
         Compiler {
             file_name: String::from("runtime"),
-            parser,
+            parser: Box::new(PythonParser {}),
         }
     }
 
@@ -28,7 +25,7 @@ impl Compiler {
     }
 
     /// 创建可运行程序文件 [`Program`]
-    pub fn create_file(self, code: String) -> Result<bool, String> {
+    pub fn create_file(&self, code: &str) -> Result<bool, String> {
         dotenv().ok();
 
         let dir = env::var("RUNTIME_FILE_DIR".to_string()).expect(&format!("read RUNTIME_FILE_DIR env variable fail"));
@@ -54,5 +51,14 @@ impl Compiler {
         }
 
         Ok(true)
+    }
+
+    pub fn run(&self, source_code: &str) -> Result<String, String> {
+        // run::python::run(source_code)
+        let result = run::python::run(&source_code);
+        match result {
+            Err(e) => Err(e.to_string()),
+            _ => Ok("success".to_string()),
+        }
     }
 }
