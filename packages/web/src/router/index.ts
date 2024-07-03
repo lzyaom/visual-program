@@ -6,20 +6,34 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/views/HomeView.vue'),
+      component: () => import('@/views/Home.vue'),
       meta: { label: '首页' }
     },
     {
       path: '/program',
       name: 'program',
       component: () => import('@/views/program/index.vue'),
-      meta: { label: '编程' }
+      meta: { label: '编程' },
+      children: [
+        {
+          path: ':id',
+          name: 'program-detail',
+          component: () => import('@/views/program/page/Editor.vue'),
+          meta: { label: '详情' }
+        }
+      ]
     },
     {
       path: '/plugin',
       name: 'plugin',
       component: () => import('@/views/plugin/index.vue'),
       meta: { label: '插件' }
+    },
+    {
+      path: '/design',
+      name: 'design',
+      component: () => import('@/views/design/index.vue'),
+      meta: { label: '设计' }
     },
     {
       path: '/system',
@@ -30,7 +44,7 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      component: () => import('@/views/AboutView.vue'),
+      component: () => import('@/views/About.vue'),
       meta: { label: '关于' }
     }
   ]
