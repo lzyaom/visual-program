@@ -17,8 +17,10 @@
     "@vueuse/core": "^10.10.0",
     "axios": "^1.7.2",
     "pinia": "^2.1.7",
+    "react-dnd-html5-backend": "^16.0.1",
     "vue": "^3.4.27",
-    "vue-router": "^4.3.2"
+    "vue-router": "^4.3.2",
+    "vue3-dnd": "^2.1.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.10.3",
