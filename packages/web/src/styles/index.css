@@ -76,3 +76,11 @@
     @apply bg-background text-foreground;
   }
 }
+
+#app {
+  @apply min-h-screen;
+
+  > .content{
+    height: calc(100vh - 3.5rem);
+  }
+}
