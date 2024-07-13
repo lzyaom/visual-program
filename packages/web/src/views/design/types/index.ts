@@ -5,3 +5,5 @@ export interface MaterialItem {
 export interface DropResult {
   name: string
 }
+
+export * from './schema'

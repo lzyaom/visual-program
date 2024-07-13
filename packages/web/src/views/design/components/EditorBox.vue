@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useDrop } from 'vue3-dnd'
-import type { DropResult } from '../types'
+import type { ComponentSchema, DropResult } from '../types'
 import { ref } from 'vue'
+import { installComponent } from '@/lib/component'
+import RenderEngin from './RenderEngin'
 
-const list = ref<string[]>([])
+const jsonschemas = ref<ComponentSchema[]>([])
 
 const [, drop] = useDrop(() => {
   return {
@@ -13,15 +15,29 @@ const [, drop] = useDrop(() => {
       canDrop: monitor.canDrop(),
       item: monitor.getItem<DropResult>()
     }),
-    drop: (item, monitor) => {
-      list.value.push((item as any).name)
+    drop: async (item, monitor) => {
+      if (!monitor.canDrop()) {
+        return
+      }
+      if (monitor.didDrop()) {
+        return
+      }
+
+      if (monitor.isOver()) {
+        const { name } = item as DropResult
+        await installComponent(name)
+        jsonschemas.value.push({
+          name,
+          text: '1111'
+        })
+      }
     }
   }
 })
 </script>
 
 <template>
-  <div class="editor-container h-full" :ref="drop">
-    <div class="item" v-for="item in list" :key="item">{{ item }}</div>
+  <div class="editor-container relative h-full" :ref="drop">
+    <RenderEngin :schema="jsonschemas"></RenderEngin>
   </div>
 </template>

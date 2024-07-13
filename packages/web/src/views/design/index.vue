@@ -16,7 +16,11 @@ import {
   AccordionTrigger,
   ScrollArea
 } from '@/components/ui'
-import { ToolBar, ContentBox, EditorBox } from './components'
+import { ToolBar, DraggableBox, EditorBox } from './components'
+
+defineOptions({
+  name: 'Design'
+})
 
 const project = ref({
   name: 'Move',
@@ -141,11 +145,11 @@ const materials = [
               >
                 <AccordionTrigger>{{ material.titile }}</AccordionTrigger>
                 <AccordionContent class="space-y-2 pb-2">
-                  <ContentBox
+                  <DraggableBox
                     v-for="item in material.items"
                     :key="item.id"
                     :name="item.name"
-                  ></ContentBox>
+                  ></DraggableBox>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
