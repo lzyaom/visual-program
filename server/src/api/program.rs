@@ -2,7 +2,7 @@ use crate::{
     compile::{check::check_content, Compiler},
     db::ShareDB,
     models::{
-        program::{Program, ProgramQuery},
+        program::{ExecFile, Program, ProgramQuery},
         schema::Schema,
     },
 };
@@ -12,12 +12,14 @@ use axum::{
     Extension, Json,
 };
 use futures::stream::TryStreamExt;
+
 use mongodb::{
     bson::{doc, oid::ObjectId},
     options::FindOptions,
     Collection,
 };
 use serde_json::{json, Value};
+use tokio::task;
 
 /// 获取程序列表
 pub async fn get_program_list(
@@ -131,39 +133,55 @@ pub async fn detele_program(db: Extension<ShareDB>, Path(id): Path<String>) -> R
 }
 
 /// 运行程序 [`Program`]
-pub async fn run_program() -> Result<Json<Value>, Json<Value>> {
+pub async fn run_program(Json(_payload): Json<ExecFile>) -> Result<Json<Value>, Json<Value>> {
     let schema = json!({"type": "object", "title": "aaa", "properties": {}, "required": []});
 
     let data = json!({"title": "aa"});
 
-    // 1. 校验内容是否符合 schema
-    let result = check_content(&schema, &data);
+    // 执行异步操作
+    let result = task::spawn_blocking(move || {
+        // 模拟一个阻塞操作
+        // std::thread::sleep(std::time::Duration::from_secs(2));
+        // 1. 校验内容是否符合 schema
+        let result = check_content(&schema, &data);
 
-    if let Err(error) = result {
-        return Err(Json(json!({
-            "code": 100,
-            "msg": "fail",
-            "data": error
-        })));
+        if let Err(error) = result {
+            return Err(json!({
+                "code": 100,
+                "msg": "fail",
+                "data": error
+            }));
+        }
+
+        // 2. 解析内容
+        let schema_content: Schema = serde_json::from_value(schema).expect("");
+
+        let compiler = Compiler::new();
+
+        let code = compiler.parser.gen_to_code(&schema_content);
+
+        // 3. 生成可执行文件
+        let result = compiler.create_file(&code);
+
+        if let Err(error) = result {
+            return Err(json!({
+                "code": 101,
+                "msg": error
+            }));
+        }
+        // 4. 运行
+        let result = compiler.run(&code);
+
+        match result {
+            Err(e) => Err(json!({ "code": 101, "msg": e })),
+            _ => Ok(()),
+        }
+    })
+    .await
+    .map_err(|_| json!({ "error": "Task failed" }))?;
+
+    if let Err(err) = result {
+        return Err(Json(err));
     }
-
-    // 2. 解析内容
-    let schema_content: Schema = serde_json::from_value(schema).expect("");
-
-    let compiler = Compiler::new();
-
-    let code = compiler.parser.gen_to_code(&schema_content);
-
-    // 3. 生成可执行文件
-    let result = compiler.create_file(code);
-
-    if let Err(error) = result {
-        return Err(Json(json!({
-            "code": 101,
-            "msg": error
-        })));
-    }
-    // 4. 运行
-
     Ok(Json(json!({"code": 0, "msg": "succss"})))
 }
