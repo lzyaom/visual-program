@@ -12,7 +12,7 @@ import {
   CopyIcon
 } from 'lucide-vue-next'
 
-import { Button } from '@/components/ui'
+import { Button } from '@components'
 
 export default defineComponent({
   name: 'ToolBar',

@@ -1,6 +1,6 @@
 import { defineComponent, h, resolveComponent, type PropType, type VNode } from 'vue'
 
-import type { ComponentSchema } from '../types'
+import type { ComponentSchema } from '#/schema'
 
 export default defineComponent({
   name: 'RenderEngin',

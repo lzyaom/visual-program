@@ -1,39 +1,34 @@
 <script setup lang="ts">
-import { useDrop } from 'vue3-dnd'
-import type { ComponentSchema, DropResult } from '../types'
 import { ref } from 'vue'
-import { installComponent } from '@/lib/component'
+import { useDrop } from 'vue3-dnd'
 import RenderEngin from './RenderEngin'
+import { installComponent } from '@/lib'
+import type { DropResult } from '#/drag'
+import type { ComponentSchema } from '#/schema'
 
 const jsonschemas = ref<ComponentSchema[]>([])
 
-const [, drop] = useDrop(() => {
-  return {
-    accept: 'box',
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-      item: monitor.getItem<DropResult>()
-    }),
-    drop: async (item, monitor) => {
-      if (!monitor.canDrop()) {
-        return
-      }
-      if (monitor.didDrop()) {
-        return
-      }
+const [, drop] = useDrop(() => ({
+  accept: 'box',
+  collect: (monitor) => ({
+    isOver: monitor.isOver(),
+    canDrop: monitor.canDrop(),
+    item: monitor.getItem<DropResult>()
+  }),
+  drop: async (item, monitor) => {
+    if (!monitor.canDrop()) {
+      return
+    }
+    if (monitor.didDrop()) {
+      return
+    }
 
-      if (monitor.isOver()) {
-        const { name } = item as DropResult
-        await installComponent(name)
-        jsonschemas.value.push({
-          name,
-          text: '1111'
-        })
-      }
+    if (monitor.isOver()) {
+      const { name } = item as DropResult
+      await installComponent(name)
     }
   }
-})
+}))
 </script>
 
 <template>
