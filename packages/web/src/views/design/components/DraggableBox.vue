@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useDrag } from 'vue3-dnd'
-import type { DropResult, MaterialItem } from '#/drag'
+import type { MaterialItem } from '#/drag'
+import type { ComponentSchema } from '#/schema'
 
 const props = defineProps<MaterialItem>()
 
@@ -9,10 +10,14 @@ const [, drag] = useDrag({
   item: () => ({ name: props.name }),
   collect: (monitor) => ({
     isDragging: monitor.isDragging(),
-    handlerId: monitor.getHandlerId()
+    handlerId: monitor.getHandlerId(),
+    offset: {
+      x: monitor.getDifferenceFromInitialOffset()?.x,
+      y: monitor.getDifferenceFromInitialOffset()?.y
+    }
   }),
   end: (item, monitor) => {
-    const dropResult = monitor.getDropResult<DropResult>()
+    const dropResult = monitor.getDropResult<ComponentSchema>()
     if (item && dropResult) {
       console.log(dropResult)
       console.log(`You dropped ${item.name} into ${dropResult.name}`)
